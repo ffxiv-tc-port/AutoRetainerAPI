@@ -22,6 +22,19 @@ public class OfflineRetainerData : IEquatable<OfflineRetainerData>
     public ulong RetainerID = 0;
     public int MBItems = 0;
 
+    /// <summary>
+    /// 這個僱員背包裡佔用的格數（不含寄售中的道具，那個是 <see cref="MBItems"/>）。
+    /// <br></br>
+    /// 來源是僱員清單本身（<c>RetainerManager.Retainer.ItemCount</c>，0x2B），
+    /// 跟 <see cref="Gil"/>／<see cref="MBItems"/> 同一份資料 —— 也就是說
+    /// <b>不需要開過那個僱員</b>就有值，但它是「該角色最後一次登入時」的快照而不是即時值。
+    /// <br></br>
+    /// 🔑 <c>-1</c> 代表<b>從來沒記錄過</b>，跟「真的是 0 件」是兩回事。
+    /// 舊設定檔沒有這個欄位，反序列化後就停在 -1，所以預設值不能改成 0 ——
+    /// UI 必須把 -1 畫成 <c>?</c>，畫成 0 會讓使用者以為僱員是空的（實際可能是滿的）。
+    /// </summary>
+    public int ItemCount = -1;
+
     public string Identity => $"{Name}";
     public bool ShouldSerializeIdentity() => false;
 
