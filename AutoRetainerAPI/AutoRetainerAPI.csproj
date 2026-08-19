@@ -21,8 +21,33 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="ECommons" Version="3.2.0.11" />
+    <!-- 🔴 ECommons 的來源必須跟消費端一致，否則會靜默換回「未加固」的 NuGet 版本。
+         AutoRetainerAPI 被 5 個外掛以子模組引入（AutoRetainer / GatherBuddyReborn /
+         Lifestream / SomethingNeedDoing / visland），在那些 repo 的樹裡本檔的位置是
+         <消費端>/AutoRetainerAPI/AutoRetainerAPI/AutoRetainerAPI.csproj，所以
+         ..\..\ECommons\ECommons\ECommons.csproj 正好是消費端自己的 ECommons 子模組
+         （＝艦隊加固過的 fork）。
+
+         這裡原本是**無條件**的 PackageReference，靠「fork 的版本號 >= 套件版本號」
+         讓 NuGet 選 ProjectReference 蓋掉它。那是**版本序依賴**的隱性機制，而且
+         這條邊寫的 3.2.0.11 已經高於 fork 的 BaseVersion 3.0.1.15 —— 也就是說
+         這個不變式**已經倒掛**：任何消費端一旦 repin 到含這條邊的 commit，
+         就會靜默改吃未加固的 NuGet ECommons，建置零錯誤零警告，只有實機看得出差別。
+         （目前 5 個消費端都還釘在 ECommons 3.0.1.5 的舊 commit 上，所以尚未爆。）
+
+         改成兩者互斥之後就不再依賴版本比較：樹裡有 ECommons 專案就走 ProjectReference，
+         沒有（單獨 clone 本 repo、或 CI）才退回 NuGet 套件。 -->
+    <PropertyGroup>
+        <ECommonsProjectPath>$(MSBuildThisFileDirectory)..\..\ECommons\ECommons\ECommons.csproj</ECommonsProjectPath>
+        <UseECommonsProjectReference Condition="Exists('$(ECommonsProjectPath)')">true</UseECommonsProjectReference>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(UseECommonsProjectReference)' == 'true'">
+        <ProjectReference Include="$(ECommonsProjectPath)" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UseECommonsProjectReference)' != 'true'">
+        <PackageReference Include="ECommons" Version="3.2.0.11" />
     </ItemGroup>
     <ItemGroup>
         <Reference Include="Newtonsoft.Json">
