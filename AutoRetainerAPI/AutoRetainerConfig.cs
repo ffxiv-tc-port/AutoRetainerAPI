@@ -13,6 +13,27 @@ namespace AutoRetainerAPI;
 //autogen via regex
 //public (.+) (\S+)( = .+;)
 //public \1 \2 => Svc.PluginInterface.GetIpcSubscriber<\1>("AutoRetainer.GetConfig.\2").InvokeFunc();
+/// <summary>
+/// 🔴 本類別的每一個 getter 都要求 AutoRetainer 外掛那頭有人註冊 "AutoRetainer.GetConfig."
+/// 開頭、後面接欄位名的 IPC 端點。上游是靠 AutoRetainer/Services/IpcConfigValuesProvider.cs
+/// 用反射把 C 的公開欄位整批註冊上去的,而該檔是 2026-01-17 才加進上游的。
+///
+/// 📌 台服 fork 的 AutoRetainer(分支 tc-7.20)分岔點早於那個日期,樹裡沒有那個檔,對
+/// GetConfig 是**零註冊**。所以在台服艦隊裡,下面 185 個 getter 只要被呼叫就會擲 Dalamud
+/// 的 IpcNotReadyError(CallGateChannel.InvokeFunc 在 Func 為 null 時直接擲,而本專案沒有
+/// 任何 SafeWrapper 會把它吞成預設值)。
+///
+/// ⚠️ 現況不會出事:五個消費端(AutoRetainer / GatherBuddyReborn / Lifestream /
+/// SomethingNeedDoing / visland)全部釘在 5a51873 那條線上,那條線沒有本檔;本分支(main)
+/// 是上游主幹快照且目標框架是 net10,艦隊的 net9 / API13 還吃不下。2026-09-05 逐 repo
+/// 實查:本類別在艦隊裡的真實呼叫點是 0 個。
+///
+/// 🔑 將來要讓消費端用到本類別時,正解是把上游的 IpcConfigValuesProvider.cs 移植進
+/// AutoRetainer,而不是刪掉這裡的 getter。⚠️ 但移植後不會全部通:2026-09-05 實測,本檔
+/// 宣告的 185 個名字裡有 165 個對得上 tc-7.20 的 Config 公開欄位,另外 20 個
+/// (FullAutoGCDelivery* / AutoFuelPurchase* / MultiOnPluginLoad 等較新的上游設定)台服
+/// 這版還沒有,移植後那 20 個仍會擲 IpcNotReadyError。
+/// </summary>
 public class AutoRetainerConfig 
 {
     public string CensorSeed => Svc.PluginInterface.GetIpcSubscriber<string>("AutoRetainer.GetConfig.CensorSeed").InvokeFunc();
