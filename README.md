@@ -23,10 +23,7 @@ commit，會**靜默**改吃未加固的 NuGet 版 ECommons，建置零錯誤零
 
 ## 誰在用它
 
-艦隊裡 24 個插件消費：`Artisan`、`AutoDuty`、`AutoHook`、`AutoRetainer`、`Avarice`、`BOCCHI`、
-`ChilledLeves`、`EurekaHelper`、`Explorers-Icebox`、`GatherBuddyReborn`、`ICE`、`LazyLoot`、
-`Lifestream`、`NecroLens`、`NotificationMaster`、`PalacePal`、`Questionable`、`Saucy`、
-`SomethingNeedDoing`、`Splatoon`、`TextAdvance`、`WrathCombo`、`YesAlready`、`visland`。
+艦隊裡 5 個插件以子模組引用：`AutoRetainer`、`GatherBuddyReborn`、`Lifestream`、`SomethingNeedDoing`、`visland`。
 
 ---
 
