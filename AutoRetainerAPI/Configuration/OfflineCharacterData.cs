@@ -10,7 +10,7 @@ namespace AutoRetainerAPI.Configuration;
 public class OfflineCharacterData
 {
     public readonly ulong CreationFrame = Svc.PluginInterface.UiBuilder.FrameCount;
-    public bool ShouldSerializeCreationFrame => false;
+    public bool ShouldSerializeCreationFrame() => false;
     public ulong CID = 0;
     public string Name = "Unknown";
     public string World = "";

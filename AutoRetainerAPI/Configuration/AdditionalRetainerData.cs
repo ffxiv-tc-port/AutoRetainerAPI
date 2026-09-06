@@ -9,7 +9,7 @@ namespace AutoRetainerAPI.Configuration;
 public class AdditionalRetainerData
 {
     public readonly ulong CreationFrame = Svc.PluginInterface.UiBuilder.FrameCount;
-    public bool ShouldSerializeCreationFrame => false;
+    public bool ShouldSerializeCreationFrame() => false;
     public bool EntrustDuplicates = false;
     public bool WithdrawGil = false;
     public int WithdrawGilPercent = 100;
