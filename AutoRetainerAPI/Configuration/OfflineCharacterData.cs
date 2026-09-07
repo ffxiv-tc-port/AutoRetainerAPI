@@ -29,8 +29,17 @@ public class OfflineCharacterData
     public HashSet<uint> UnlockedGatheringItems = [];
     public short[] ClassJobLevelArray = new short[30];
     public uint Gil = 0;
+    // 🔴 GCSeals 與 GCRank 從加進這個型別以來一直沒有任何人寫過（2026-09-08 全艦隊實查：
+    //    整個 org 只有這裡的宣告，其餘命中全是 GCScripShopItem 的 CostGCSeals，不同符號）。
+    //    現在由 AutoRetainer 的登入快照寫入，取樣時間看 GCSealsUpdatedAt。
+    //    型別與預設值刻意不動：改動它們對既有消費端才是回退行為。
     public uint GCSeals = 0;
     public uint GCRank = 0;
+    /// <summary>軍票上限（會隨軍階提高）。三態：-1 = 從沒讀到過；0 = 這個角色還是平民，
+    /// 沒有加入大國防聯軍，「軍票」對它不成立（那與「不知道」是兩件事，顯示端要分開畫）。</summary>
+    public int GCSealsMax = -1;
+    /// <summary>GCSeals／GCSealsMax／GCRank 這一組的取樣時間。null = 從沒讀到過。</summary>
+    public DateTime? GCSealsUpdatedAt = null;
 
     // 每日／每週配額的登入快照。上面那些欄位（Gil／Ventures／Ceruleum…）都是「讀不到就是 0」，
     // 分辨不出「還沒讀到」與「真的是 0」；這三組刻意不重蹈覆轍，做成三態：
