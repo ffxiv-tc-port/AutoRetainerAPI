@@ -31,6 +31,27 @@ public class OfflineCharacterData
     public uint Gil = 0;
     public uint GCSeals = 0;
     public uint GCRank = 0;
+
+    // 每日／每週配額的登入快照。上面那些欄位（Gil／Ventures／Ceruleum…）都是「讀不到就是 0」，
+    // 分辨不出「還沒讀到」與「真的是 0」；這三組刻意不重蹈覆轍，做成三態：
+    //   值 == -1 且對應的時間戳 == null ⇒ 從來沒有成功讀到過（顯示端要畫灰色的 ?）
+    //   值 >= 0 且時間戳有值           ⇒ 那個時間點讀到的真值，0 是合法值（額度用完）
+    // 🔴 顯示端不可以把「沒讀過」畫成 0 —— 委託書的 0 與籌備委託品的 0 都有相反的意義，
+    //    畫成 0 會讓使用者以為「這個角色沒有東西可做」而剛好把該做的漏掉。
+    // 🔴 寫入端在遊戲結構還沒就緒時整組不覆寫，維持上一次的值與時間戳（過期好過寫假的 0）。
+    // 📌 舊設定檔沒有這些鍵，反序列化時會保留欄位初始式 ⇒ 舊使用者一律落在「沒讀過」，
+    //    第一次登入快照就會補上，不需要遷移。
+    /// <summary>理符任務受理限額剩餘張數，上限 100。-1 = 從沒讀到。</summary>
+    public int LevequestAllowances = -1;
+    public DateTime? LevequestAllowancesUpdatedAt = null;
+    /// <summary>籌備委託品本週剩餘次數（滿額 12）。-1 = 從沒讀到。</summary>
+    public int CustomDeliveryAllowances = -1;
+    public DateTime? CustomDeliveryAllowancesUpdatedAt = null;
+    /// <summary>本週已取得的限定神典石數量。-1 = 從沒讀到。</summary>
+    public int WeeklyTomestoneCount = -1;
+    /// <summary>限定神典石的每週上限，取自 Tomestones 資料表而非寫死。-1 = 從沒讀到。</summary>
+    public int WeeklyTomestoneCap = -1;
+    public DateTime? WeeklyTomestoneUpdatedAt = null;
     public List<OfflineVesselData> OfflineAirshipData = [];
     public List<OfflineVesselData> OfflineSubmarineData = [];
     public HashSet<string> EnabledAirships = [];
