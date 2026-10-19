@@ -22,19 +22,25 @@ public partial class AutoRetainerApi
 
     private void OnRetainerPostVentureTaskDrawAction(ulong cid, string retainer)
     {
+        // AutoRetainer 主視窗每列每幀都送這個事件。捕獲參數的 lambda 會讓閉包在方法一進來就配置（沒人掛處理器也一樣；
+        // 捕獲分支裡的區域變數也沒用，編譯器會把它併到方法層），所以 lambda 放在另一個方法裡。
         if(OnRetainerPostVentureTaskDraw != null)
         {
-            GenericHelpers.Safe(() => OnRetainerPostVentureTaskDraw(cid, retainer));
+            InvokeRetainerPostVentureTaskDraw(cid, retainer);
         }
     }
+
+    private void InvokeRetainerPostVentureTaskDraw(ulong cid, string retainer) => GenericHelpers.Safe(() => OnRetainerPostVentureTaskDraw(cid, retainer));
 
     private void OnRetainerSettingsDrawAction(ulong cid, string retainer)
     {
         if(OnRetainerSettingsDraw != null)
         {
-            GenericHelpers.Safe(() => OnRetainerSettingsDraw(cid, retainer));
+            InvokeRetainerSettingsDraw(cid, retainer);
         }
     }
+
+    private void InvokeRetainerSettingsDraw(ulong cid, string retainer) => GenericHelpers.Safe(() => OnRetainerSettingsDraw(cid, retainer));
 
     private void OnRetainerReadyForPostprocessIntl(string plugin, string retainer)
     {
